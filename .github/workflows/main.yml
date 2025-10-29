@@ -14,39 +14,19 @@ jobs:
       - name: "1. Descargar repositorio"
         uses: actions/checkout@v4
 
-      - name: "2. Instalar Tailscale y configurar usuario"
+      - name: "2. Instalar Tailscale"
         run: |
-          # Instalar Tailscale en macOS
           curl -fsSL https://tailscale.com/install.sh | sh
-          
-          # Configurar contraseña para el usuario (formato macOS)
-          sudo dscl . -passwd /Users/runner runnerpass
-          
-          # Habilitar SSH en macOS
-          sudo systemsetup -setremotelogin on
 
-      - name: "3. Conectar Tailscale y mostrar datos"
+      - name: "3. Conectar Tailscale"
         run: |
-          # Conectar a Tailscale
           sudo tailscale up --authkey=tskey-auth-kBU3f1HEM721CNTRL-ZwRrWsEkEhLYV6GgDopDhL6hKCgVjrDs --hostname=github-macos
-          
-          echo "--------------------------------------------------------------------"
-          echo "CONEXIÓN POR TAILSCALE (SSH):"
-          echo "ssh runner@$(tailscale ip -4)"
-          echo "CONTRASEÑA: runnerpass"
-          echo "--------------------------------------------------------------------"
-          echo "Sistema: macOS $(sw_vers -productVersion)"
+          echo "✅ Tailscale conectado: $(tailscale ip -4)"
 
-      - name: "4. Mantener sesión activa"
-        run: |
-          echo "🖥️ macOS listo para Android emulation"
-          echo "📡 IP: $(tailscale ip -4)"
-          
-          # Mantener sesión activa
-          while true; do
-            echo "$(date): Sesión macOS activa..."
-            sleep 60
-          done
+      - name: "4. Iniciar sesión interactiva con tmate"
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: false
 
       - name: "5. Guardar cambios"
         if: always()
@@ -55,5 +35,5 @@ jobs:
           git config --global user.email 'actions@github.com'
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "Guardado automático desde macOS" && git push
+            git commit -m "Guardado desde macOS" && git push
           fi
