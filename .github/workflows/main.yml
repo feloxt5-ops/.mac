@@ -19,8 +19,8 @@ jobs:
           # Instalar Tailscale en macOS
           curl -fsSL https://tailscale.com/install.sh | sh
           
-          # Configurar contraseña para el usuario
-          echo "runner:runnerpass" | sudo chpasswd
+          # Configurar contraseña para el usuario (formato macOS)
+          sudo dscl . -passwd /Users/runner runnerpass
           
           # Habilitar SSH en macOS
           sudo systemsetup -setremotelogin on
@@ -36,13 +36,11 @@ jobs:
           echo "CONTRASEÑA: runnerpass"
           echo "--------------------------------------------------------------------"
           echo "Sistema: macOS $(sw_vers -productVersion)"
-          echo "Tiempo: 6 horas"
 
       - name: "4. Mantener sesión activa"
         run: |
           echo "🖥️ macOS listo para Android emulation"
           echo "📡 IP: $(tailscale ip -4)"
-          echo "⏰ Tiempo restante: 6 horas"
           
           # Mantener sesión activa
           while true; do
